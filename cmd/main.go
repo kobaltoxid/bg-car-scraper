@@ -13,7 +13,8 @@ import (
 func main() {
 	fmt.Println("hello")
 
-	maxPages := flag.Int("maxPages", 100, "maximum number of pages to scrape")
+	maxPages := flag.Int("maxPages", 10, "maximum number of pages to scrape")
+	brand := flag.String("brand", "", "car brand ID (optional)")
 	flag.Parse()
 
 	ctx, cancel := chromedp.NewContext(
@@ -21,5 +22,5 @@ func main() {
 	)
 	defer cancel()
 
-	calc.GetAllCarsUpToGivenPage(ctx, maxPages)
+	calc.GetAllCars(ctx, maxPages, brand)
 }

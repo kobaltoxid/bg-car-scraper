@@ -1,12 +1,13 @@
 package calc
 
 import (
-	"bg-carinator/internal/offers"
-	"bg-carinator/internal/searchcriteria"
 	"context"
 	"fmt"
 	"log"
 	"net/url"
+
+	"github.com/kobaltoxid/bg-car-scraper/internal/offers"
+	"github.com/kobaltoxid/bg-car-scraper/internal/searchcriteria"
 )
 
 // Accepts brand, page, and a slice of model IDs

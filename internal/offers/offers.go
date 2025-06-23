@@ -18,6 +18,7 @@ type Offer struct {
 	Title    string
 	ImageURL string
 	ListLink string
+	Price    string
 }
 
 func ExtractAllOffers(htmlStr string) ([]Offer, error) {
@@ -46,6 +47,7 @@ func ExtractAllOffers(htmlStr string) ([]Offer, error) {
 					Title:    title,
 					ImageURL: findImageURL(n),
 					ListLink: findListLink(n),
+					Price:    findPrice(n),
 				}
 				offers = append(offers, offer)
 				// Do not recurse further into this offer node
@@ -58,6 +60,44 @@ func ExtractAllOffers(htmlStr string) ([]Offer, error) {
 	}
 	findOffers(doc)
 	return offers, nil
+}
+
+func findPrice(n *html.Node) string {
+	var price string
+	var f func(*html.Node)
+	f = func(nn *html.Node) {
+		if nn.Type == html.ElementNode && nn.Data == "h6" { // Look for h6 element
+			for _, attr := range nn.Attr {
+				if attr.Key == "class" &&
+					strings.Contains(attr.Val, "card__title") &&
+					strings.Contains(attr.Val, "mdc-typography") &&
+					strings.Contains(attr.Val, "mdc-typography--headline6") &&
+					strings.Contains(attr.Val, "price") {
+					price = getTextContent(nn)
+					return
+				}
+			}
+		}
+		for c := nn.FirstChild; c != nil; c = c.NextSibling {
+			if price == "" {
+				f(c)
+			}
+		}
+	}
+	f(n)
+	return strings.TrimSpace(price)
+}
+
+// Helper to get all text content from a node
+func getTextContent(n *html.Node) string {
+	if n.Type == html.TextNode {
+		return n.Data
+	}
+	var sb strings.Builder
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		sb.WriteString(getTextContent(c))
+	}
+	return sb.String()
 }
 
 // Helper to find image URL in the subtree

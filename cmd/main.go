@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 
-	"bg-carinator/internal/calc"
+	"github.com/kobaltoxid/bg-car-scraper/internal/calc"
 )
 
 func main() {

@@ -26,3 +26,14 @@ func BrandNameToID(brand string) CarBrand {
 		return BrandUnknown
 	}
 }
+
+var modelNameToIDs = map[string][]string{
+	"5series":  {"1000003", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132"},
+	"5-series": {"1000003", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132"},
+	"5":        {"1000003", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132"},
+	// Add more models as needed
+}
+
+func ModelNameToIDs(model string) []string {
+	return modelNameToIDs[strings.ToLower(model)]
+}

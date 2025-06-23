@@ -8,25 +8,34 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 )
 
-func calcUrl(brand searchcriteria.CarBrand, page int) string {
-	var url string
+// Accepts brand, page, and a slice of model IDs
+func calcUrl(brand searchcriteria.CarBrand, page int, modelIDs []string) string {
+	base := "https://www.cars.bg/carslist.php"
+	params := url.Values{}
 	if brand != 0 {
-		url = fmt.Sprintf("https://www.cars.bg/carslist.php?subm=1&add_search=1&typeoffer=1&brandId=%d&page=%d", brand, page)
-	} else {
-		url = fmt.Sprintf("https://www.cars.bg/carslist.php?page=%d", page)
+		params.Set("subm", "1")
+		params.Set("add_search", "1")
+		params.Set("typeoffer", "1")
+		params.Set("brandId", fmt.Sprintf("%d", brand))
 	}
-	return url
+	params.Set("page", fmt.Sprintf("%d", page))
+	for _, mid := range modelIDs {
+		params.Add("models[]", mid)
+	}
+	return base + "?" + params.Encode()
 }
 
-func GetAllCars(ctx context.Context, maxPages *int, brand *string) {
+func GetAllCars(ctx context.Context, maxPages *int, brand *string, model *string) {
 	var allOffers []offers.Offer
 
 	carBrandId := searchcriteria.BrandNameToID(*brand)
+	modelIDs := searchcriteria.ModelNameToIDs(*model)
 
 	for page := 1; page <= *maxPages; page++ {
-		url := calcUrl(carBrandId, page)
+		url := calcUrl(carBrandId, page, modelIDs)
 		fmt.Println("Scraping:", url)
 
 		offersOnPage, err := offers.GetOffersByUrl(ctx, url)
